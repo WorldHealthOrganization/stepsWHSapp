@@ -3,7 +3,7 @@ Title: WHO STEPS Depression Self-assessment Tool
 Version: 0.0.0.9000
 Authors@R: 
     person("Sergei", "Bychkov", , "bychkovs@who.int", role = c("aut", "cre"))
-Description: The tool generates a real-time assessment of potential depression based on World Health Survey (WHS) algorithm, which is used in STEPS Depression module.
+Description: The tool generates a real-time assessment of potential depression based on World Health Survey (WHS) algorithm, which is used in STEPS Depressive symptoms module.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
