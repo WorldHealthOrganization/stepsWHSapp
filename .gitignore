@@ -37,3 +37,16 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# system files .DS_Store on macOS
+.DS_Store
+
+# MDB data files
+*.mdb
+
+# CSV files
+*.csv
+
+# DOCX files
+*.docx
+*.doc
