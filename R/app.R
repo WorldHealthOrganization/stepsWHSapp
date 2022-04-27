@@ -3,13 +3,20 @@
 library(here)
 library(shiny)
 library(shinyjs)
-library(tidyverse)
+library(dplyr)
 
 # load WHS function
 # source("WHSdepression.R")
 # Remove any calls to source(), since load_all() automatically sources all .R files in R/.
 
 ################################################################################
+
+#' Function to run the Shiny app 
+#'
+#' Includes the WHSdepression function for assessing potential depression.
+#'
+#' @export
+#' 
 
 stepsWHSApp <- function(...) {
   
