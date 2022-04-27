@@ -1,9 +1,9 @@
 
 # load packages
-# library(here)
-# library(shiny)
-# library(shinyjs)
-# library(tidyverse)
+library(here)
+library(shiny)
+library(shinyjs)
+library(tidyverse)
 
 # load WHS function
 # source("WHSdepression.R")
@@ -12,12 +12,6 @@
 ################################################################################
 
 stepsWHSApp <- function(...) {
-  
-  # load packages
-  library(here)
-  library(shiny)
-  library(shinyjs)
-  library(tidyverse)
   
   # create a vector of questions DA1-23 
   da_questions <- 
