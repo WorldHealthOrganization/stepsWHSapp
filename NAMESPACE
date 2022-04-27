@@ -2,5 +2,4 @@
 
 import(here)
 import(shiny)
-import(shinyjs)
 import(tidyverse)
