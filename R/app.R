@@ -1,9 +1,9 @@
 
 # load packages
-# library(here)
-# library(shiny)
-# library(shinyjs)
-# library(tidyverse)
+library(here)
+library(shiny)
+library(shinyjs)
+library(tidyverse)
 
 # load WHS function
 # source("WHSdepression.R")
