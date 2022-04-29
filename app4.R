@@ -1,9 +1,10 @@
 # NOTE: this version is currently used as a stand-alone package in R folder
+# NOTE2: this version has been updated
 # load packages
 library(here)
 library(shiny)
 library(shinyjs)
-library(tidyverse)
+library(dplyr)
 
 # load WHS function
 source("WHSdepression.R")
@@ -84,6 +85,8 @@ ui <- fluidPage(
   # verbatimTextOutput('da_out'),
   # submit button for survey
   actionButton(inputId = "submit", label = "submit")
+  # clean button for resetting radios to null
+  # actionButton(inputId = "reset", label = "clean all")
   
 )
 
@@ -215,11 +218,11 @@ server <- function(input, output, session) {
 
     # 1
     if ((!is.null(input$da1) && input$da1 == "Yes") &&
-        (!is.null(input$da5) && input$da5 != "") && # must NOT be empty
+        (!is.null(input$da5) && input$da5 != "") && # must NOT be empty (subquestion)
         (!is.null(input$da6) && input$da6 != "Yes") &&
         (!is.null(input$da7) && input$da7 != "Yes") &&
         (!is.null(input$da8) && input$da8 != "Yes") &&
-        # then the rest of da9 to da23
+        # then the rest of da9 to da23 (subquestions)
         (is.null(input$da9)) && # must BE empty da9-da23
         (is.null(input$da10)) &&
         (is.null(input$da11)) &&
@@ -310,9 +313,46 @@ server <- function(input, output, session) {
       enable("submit")
     } else {
       disable("submit")
+      # reset subquestions if they were first selected and then answers to main questions changed
+      updateRadioButtons(session = session, inputId = "da5", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da9", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da10", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da11", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da12", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da13", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da14", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da15", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da16", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da17", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da18", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da19", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da20", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da21", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da22", selected = character(0))
+      updateRadioButtons(session = session, inputId = "da23", selected = character(0))
     }
 
   })
+  
+  # observe reset button
+  # observeEvent(input$reset, {
+  #   updateRadioButtons(session = session, inputId = "da5", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da9", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da10", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da11", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da12", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da13", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da14", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da15", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da16", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da17", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da18", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da19", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da20", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da21", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da22", selected = character(0))
+  #   updateRadioButtons(session = session, inputId = "da23", selected = character(0))
+  # })
       
   
 }
