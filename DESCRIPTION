@@ -1,6 +1,6 @@
 Package: stepsWHSapp
 Title: WHO STEPS Depression Self-assessment Tool
-Version: 0.0.0.9000
+Version: 0.0.1.0000
 Authors@R: 
     person(given = "Sergei", family = "Bychkov", email = "bychkovs@who.int", role = c("aut", "cre"))
 Description: The tool generates a real-time assessment of potential depression based on World Health Survey (WHS) algorithm, which is used in STEPS Depressive symptoms module.

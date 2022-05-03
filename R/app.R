@@ -92,8 +92,6 @@ stepsWHSApp <- function(...) {
     hidden(radioButtons("da21", da_questions[21], answer_choices, selected = character(0), inline=TRUE)),
     hidden(radioButtons("da22", da_questions[22], answer_choices, selected = character(0), inline=TRUE)),
     hidden(radioButtons("da23", da_questions[23], answer_choices, selected = character(0), inline=TRUE)),
-    # print answer choices in real time (USE FOR TESTING INPUT/OUPUT)
-    # verbatimTextOutput('da_out'),
     # submit button for survey
     actionButton(inputId = "submit", label = "submit")
     
@@ -157,28 +155,12 @@ stepsWHSApp <- function(...) {
       
     })
     
-    # USE FOR TESTING INPUT/OUPUT 
-    # note we use the syntax input[['foo']] instead of input$foo, because we have
-    # to construct the id as a character string, then use it to access the value;
-    # same thing applies to the output object below
-    # output$da_out <- renderPrint({
-    #   res <<- lapply(1:23, function(i) input[[paste0('da', i)]])
-    #   str(setNames(res, paste0('da', 1:23)))
-    # })
-    
-    
     # what happens on clicking submit
     observeEvent(
-      input$submit,{
-        # write a matrix called responses
-        responses <<- matrix(ncol = length(da_codes), nrow=0)
-        # add column names from vector
-        colnames(responses) <<- da_codes
-        # OR a one-liner:
-        #responses <<- setNames(data.frame(matrix(ncol = length(da_codes), nrow = 0)), responses)
+      input$submit, {
         
-        # list values from table
-        listed_responses <<- lapply(1:23, function(i) input[[paste0('da', i)]])
+        # collect values/answers as a list 
+        listed_responses <- lapply(1:23, function(i) input[[paste0('da', i)]])
         
         # function for potential NULL values in the list, converting them to NA
         # when there are skipped questions
@@ -186,27 +168,17 @@ stepsWHSApp <- function(...) {
           x[sapply(x, is.null)] <- NA
           return(x)
         }
-        listed_responses <<- nullToNA(listed_responses)
+        listed_responses <- nullToNA(listed_responses)
         
-        # create one row matrix with unlisted responses
-        unlisted_responses <<- t(as.matrix(unlist(listed_responses)))
-        
-        # combine it with preexisting df responses
-        responses <<- rbind(responses, unlisted_responses)
-        
-        df_flat <<- as.data.frame(responses)
-        colnames(df_flat) <<- da_codes
+        # create one row df with unlisted responses (first unlist as matrix, transpose & set column names)
+        unlisted_responses <- setNames(as.data.frame(t(as.matrix(unlist(listed_responses)))), da_codes)
         
         # recode character values to numbers for using with WHS function
-        # base R approach:
-        # nm1 <<- setNames(c(1,2,77,88), answer_choices)
-        # df_flat[] <<- lapply(df_flat, function(x) nm1[x])
-        # OR dplyr approach:
-        df_flat <<- df_flat %>%
+        unlisted_responses <- unlisted_responses %>%
           mutate(across(everything(), ~dplyr::recode(., 'Yes'= 1, 'No'= 2, "Don't know" = 77, 'Refuse'= 88)))
         
         # produce depression results
-        depression_results <<- whs_depression(df_flat) %>% mutate(across(everything(), as.character))
+        depression_results <- whs_depression(unlisted_responses) %>% mutate(across(everything(), as.character))
         
         # show a modal pop-up with result message
         showModal(modalDialog(
@@ -217,115 +189,137 @@ stepsWHSApp <- function(...) {
           )
         ))
         
-        # save response if needed
-        # write.table(responses, sep = ",", file = "responses.csv", append = TRUE, quote = FALSE)
-      }
+        # save response (if needed)
+        write_csv(depression_results, "depression_results.csv", append = TRUE)
+      })
+    
+    # activate submit button only when radios are selected (observe all conditions)
+    observeEvent(
+      ignoreInit = TRUE, 
+      c(input$da1, input$da5, input$da6, input$da7, input$da8,
+        input$da9, input$da10, input$da11, input$da12, input$da13,
+        input$da14, input$da15, input$da16, input$da17, input$da18,
+        input$da19, input$da20, input$da21, input$da22, input$da23), {
+          
+          # 1
+          if ((!is.null(input$da1) && input$da1 == "Yes") &&
+              (!is.null(input$da5) && input$da5 != "") && # must NOT be empty (subquestion)
+              (!is.null(input$da6) && input$da6 != "Yes") &&
+              (!is.null(input$da7) && input$da7 != "Yes") &&
+              (!is.null(input$da8) && input$da8 != "Yes")) {
+            # da9-da23 must BE empty
+            is.null(input$da9)
+            is.null(input$da10)
+            is.null(input$da11) 
+            is.null(input$da12)
+            is.null(input$da13)
+            is.null(input$da14)
+            is.null(input$da15)
+            is.null(input$da16)
+            is.null(input$da17)
+            is.null(input$da18)
+            is.null(input$da19)
+            is.null(input$da20)
+            is.null(input$da21)
+            is.null(input$da22)
+            is.null(input$da23)
+            updateRadioButtons(session = session, inputId = "da9", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da10", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da11", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da12", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da13", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da14", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da15", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da16", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da17", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da18", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da19", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da20", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da21", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da22", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da23", selected = character(0))
+            enable("submit")
+          } 
+          # 2
+          else if ((!is.null(input$da1) && input$da1 != "Yes") &&
+                   (!is.null(input$da6) && input$da6 != "Yes") &&
+                   (!is.null(input$da7) && input$da7 != "Yes") &&
+                   (!is.null(input$da8) && input$da8 != "Yes")) {
+            # da5 must BE empty
+            is.null(input$da5)
+            # da9-da23 must BE empty
+            is.null(input$da9)
+            is.null(input$da10)
+            is.null(input$da11) 
+            is.null(input$da12)
+            is.null(input$da13)
+            is.null(input$da14)
+            is.null(input$da15)
+            is.null(input$da16)
+            is.null(input$da17)
+            is.null(input$da18)
+            is.null(input$da19)
+            is.null(input$da20)
+            is.null(input$da21)
+            is.null(input$da22)
+            is.null(input$da23)
+            updateRadioButtons(session = session, inputId = "da5", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da9", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da10", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da11", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da12", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da13", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da14", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da15", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da16", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da17", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da18", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da19", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da20", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da21", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da22", selected = character(0))
+            updateRadioButtons(session = session, inputId = "da23", selected = character(0))
+            enable("submit")
+          } 
+          # 3
+          else if ((!is.null(input$da1) && input$da1 == "Yes") &&
+                   (!is.null(input$da5) && input$da5 != "") && # must NOT be empty
+                   ((!is.null(input$da6) && input$da6 == "Yes") ||
+                    (!is.null(input$da7) && input$da7 == "Yes") ||
+                    (!is.null(input$da8) && input$da8 == "Yes")) &&
+                   # then the rest of da9 to da23
+                   # da9-da23 must NOT be empty
+                   (!is.null(input$da9)) && 
+                   (!is.null(input$da10)) && (!is.null(input$da11)) && (!is.null(input$da12)) &&
+                   (!is.null(input$da13)) && (!is.null(input$da14)) && (!is.null(input$da15)) &&
+                   (!is.null(input$da16)) && (!is.null(input$da17)) && (!is.null(input$da18)) &&
+                   (!is.null(input$da19)) && (!is.null(input$da20)) && (!is.null(input$da21)) &&
+                   (!is.null(input$da22)) && (!is.null(input$da23))) {
+            enable("submit")
+          } 
+          # 4
+          else if ((!is.null(input$da1) && input$da1 != "Yes") &&
+                   ((!is.null(input$da6) && input$da6 == "Yes") ||
+                    (!is.null(input$da7) && input$da7 == "Yes") ||
+                    (!is.null(input$da8) && input$da8 == "Yes")) &&
+                   # then the rest of da9 to da23
+                   # da9-da23 must NOT be empty
+                   (!is.null(input$da9)) && 
+                   (!is.null(input$da10)) && (!is.null(input$da11)) && (!is.null(input$da12)) &&
+                   (!is.null(input$da13)) && (!is.null(input$da14)) && (!is.null(input$da15)) &&
+                   (!is.null(input$da16)) && (!is.null(input$da17)) && (!is.null(input$da18)) &&
+                   (!is.null(input$da19)) && (!is.null(input$da20)) && (!is.null(input$da21)) &&
+                   (!is.null(input$da22)) && (!is.null(input$da23))) {
+            # da5 must BE empty
+            is.null(input$da5)
+            updateRadioButtons(session = session, inputId = "da5", selected = character(0))
+            enable("submit")
+          } else { 
+            disable("submit") 
+          }
+          
+        }
     )
-    
-    # activate submit button only when radios are selected
-    observeEvent(ignoreInit = TRUE, c(input$da1, input$da5, input$da6, input$da7, input$da8), {
-      
-      # 1
-      if ((!is.null(input$da1) && input$da1 == "Yes") &&
-          (!is.null(input$da5) && input$da5 != "") && # must NOT be empty
-          (!is.null(input$da6) && input$da6 != "Yes") &&
-          (!is.null(input$da7) && input$da7 != "Yes") &&
-          (!is.null(input$da8) && input$da8 != "Yes") &&
-          # then the rest of da9 to da23
-          (is.null(input$da9)) && # must BE empty da9-da23
-          (is.null(input$da10)) &&
-          (is.null(input$da11)) &&
-          (is.null(input$da12)) &&
-          (is.null(input$da13)) &&
-          (is.null(input$da14)) &&
-          (is.null(input$da15)) &&
-          (is.null(input$da16)) &&
-          (is.null(input$da17)) &&
-          (is.null(input$da18)) &&
-          (is.null(input$da19)) &&
-          (is.null(input$da20)) &&
-          (is.null(input$da21)) &&
-          (is.null(input$da22)) &&
-          (is.null(input$da23))) {
-        enable("submit")
-      } 
-      # 2
-      else if ((!is.null(input$da1) && input$da1 != "Yes") &&
-               (is.null(input$da5)) && # must BE empty
-               (!is.null(input$da6) && input$da6 != "Yes") &&
-               (!is.null(input$da7) && input$da7 != "Yes") &&
-               (!is.null(input$da8) && input$da8 != "Yes") &&
-               # then the rest of da9 to da23
-               (is.null(input$da9)) && # must BE empty da9-da23
-               (is.null(input$da10)) &&
-               (is.null(input$da11)) &&
-               (is.null(input$da12)) &&
-               (is.null(input$da13)) &&
-               (is.null(input$da14)) &&
-               (is.null(input$da15)) &&
-               (is.null(input$da16)) &&
-               (is.null(input$da17)) &&
-               (is.null(input$da18)) &&
-               (is.null(input$da19)) &&
-               (is.null(input$da20)) &&
-               (is.null(input$da21)) &&
-               (is.null(input$da22)) &&
-               (is.null(input$da23))) {
-        enable("submit")
-      } 
-      # 3
-      else if ((!is.null(input$da1) && input$da1 == "Yes") &&
-               (!is.null(input$da5) && input$da5 != "") && # must NOT be empty
-               ((!is.null(input$da6) && input$da6 == "Yes") ||
-                (!is.null(input$da7) && input$da7 == "Yes") ||
-                (!is.null(input$da8) && input$da8 == "Yes")) &&
-               # then the rest of da9 to da23
-               (!is.null(input$da9) && input$da9 != "") && # must NOT be empty da9-da23
-               (!is.null(input$da10) && input$da10 != "") &&
-               (!is.null(input$da11) && input$da11 != "") &&
-               (!is.null(input$da12) && input$da12 != "") &&
-               (!is.null(input$da13) && input$da13 != "") &&
-               (!is.null(input$da14) && input$da14 != "") &&
-               (!is.null(input$da15) && input$da15 != "") &&
-               (!is.null(input$da16) && input$da16 != "") &&
-               (!is.null(input$da17) && input$da17 != "") &&
-               (!is.null(input$da18) && input$da18 != "") &&
-               (!is.null(input$da19) && input$da19 != "") &&
-               (!is.null(input$da20) && input$da20 != "") &&
-               (!is.null(input$da21) && input$da21 != "") &&
-               (!is.null(input$da22) && input$da22 != "") &&
-               (!is.null(input$da23) && input$da23 != "")) {
-        enable("submit")
-      } 
-      # 4
-      else if ((!is.null(input$da1) && input$da1 != "Yes") &&
-               (is.null(input$da5)) && # must BE empty
-               ((!is.null(input$da6) && input$da6 == "Yes") ||
-                (!is.null(input$da7) && input$da7 == "Yes") ||
-                (!is.null(input$da8) && input$da8 == "Yes")) &&
-               # then the rest of da9 to da23
-               (!is.null(input$da9) && input$da9 != "") && # must NOT be empty da9-da23
-               (!is.null(input$da10) && input$da10 != "") &&
-               (!is.null(input$da11) && input$da11 != "") &&
-               (!is.null(input$da12) && input$da12 != "") &&
-               (!is.null(input$da13) && input$da13 != "") &&
-               (!is.null(input$da14) && input$da14 != "") &&
-               (!is.null(input$da15) && input$da15 != "") &&
-               (!is.null(input$da16) && input$da16 != "") &&
-               (!is.null(input$da17) && input$da17 != "") &&
-               (!is.null(input$da18) && input$da18 != "") &&
-               (!is.null(input$da19) && input$da19 != "") &&
-               (!is.null(input$da20) && input$da20 != "") &&
-               (!is.null(input$da21) && input$da21 != "") &&
-               (!is.null(input$da22) && input$da22 != "") &&
-               (!is.null(input$da23) && input$da23 != "")) {
-        enable("submit")
-      } else {
-        disable("submit")
-      }
-      
-    })
-    
     
   }
   
